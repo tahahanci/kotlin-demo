@@ -23,6 +23,18 @@ class CustomerService(private val customerRepository: CustomerRepository,
         return customerRepository.save(customer)
     }
 
+    fun deleteCustomer(email: String) {
+        val customer = customerRepository.findCustomerByEmail(email)
+
+        if (customer != null) {
+            customerRepository.delete(customer)
+        }
+    }
+
+    fun getAllCustomers() : List<Customer> {
+        return customerRepository.findAllByEmailIsNotNull()
+    }
+
     private fun isCustomerExist(email: String): Boolean {
         return customerRepository.findCustomerByEmail(email) != null
     }
