@@ -15,28 +15,20 @@ class CustomerService(private val customerRepository: CustomerRepository,
     }
 
     fun saveCustomer(customerDto: CustomerDto): Customer? {
-        if (isCustomerExist(customerDto.email)) {
-            throw IllegalArgumentException("Customer exist with given mail!")
-        }
+        customerRepository.findCustomerByEmail(customerDto.email)
+            ?.let { throw IllegalArgumentException() }
 
-        val customer = customerMapper.customerFromCustomerDto(customerDto)
-        return customerRepository.save(customer)
+        return customerMapper.customerFromCustomerDto(customerDto)
+            .let(customerRepository::save)
     }
 
     fun deleteCustomer(email: String) {
-        val customer = customerRepository.findCustomerByEmail(email)
-
-        if (customer != null) {
-            customerRepository.delete(customer)
-        }
+        customerRepository.findCustomerByEmail(email)
+            ?.let(customerRepository::delete)
     }
 
     fun getAllCustomers() : List<Customer> {
         return customerRepository.findAllByEmailIsNotNull()
-    }
-
-    private fun isCustomerExist(email: String): Boolean {
-        return customerRepository.findCustomerByEmail(email) != null
     }
 
 }
