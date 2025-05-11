@@ -38,8 +38,12 @@ class CustomerService(private val customerRepository: CustomerRepository,
     }
 
     fun deleteCustomer(email: String) {
-        customerRepository.findCustomerByEmail(email)
-            ?.let(customerRepository::delete)
+        if (!isCustomerExist(email)) {
+            throw IllegalArgumentException("Customer does not exist with $email")
+        }
+
+        val customer = customerRepository.findCustomerByEmail(email)
+        customerRepository.delete(customer)
     }
 
     fun getAllCustomers() : List<Customer> {
@@ -47,7 +51,8 @@ class CustomerService(private val customerRepository: CustomerRepository,
     }
 
     private fun isCustomerExist(email: String) : Boolean {
-        return customerRepository.findCustomerByEmail(email) != null
+        val customer = customerRepository.findCustomerByEmail(email)
+        return customer != null
     }
 
 }
